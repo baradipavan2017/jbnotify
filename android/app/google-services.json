@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "377047462386",
+    "project_id": "jb-notifyapp",
+    "storage_bucket": "jb-notifyapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:377047462386:android:7946f16810892fce3ffb6b",
+        "android_client_info": {
+          "package_name": "com.baradipavan.jb_notify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "377047462386-8mk5knnudmo9nmt2pi022f946a3r5ed0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-Eqv7LUGyIjQYaygzc7o04rFxszW7Ph8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "377047462386-8mk5knnudmo9nmt2pi022f946a3r5ed0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
