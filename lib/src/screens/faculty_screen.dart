@@ -1,10 +1,34 @@
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
+import 'package:jb_notify/src/config/api_constants.dart';
+import 'package:jb_notify/src/widgets/notice_list_tile.dart';
 
 class FacultyScreen extends StatelessWidget {
-  const FacultyScreen({Key? key}) : super(key: key);
+  FacultyScreen({Key? key}) : super(key: key);
+  final dbRef = FirebaseDatabase.instance.ref().child(APIConstants.faculty);
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    dbRef.keepSynced(true);
+    return Scaffold(
+      body: Container(
+        padding: const EdgeInsets.all(8.0),
+        child: FirebaseAnimatedList(
+          query: dbRef,
+          itemBuilder: (BuildContext context, DataSnapshot snapShot,
+              Animation<double> animation, int index) {
+            var json = Map<String, dynamic>.from(snapShot.value as Map);
+            return NoticeListTile(
+              title: json[NoticeConstants.title],
+              description: json[NoticeConstants.description],
+              dateTime: json[NoticeConstants.dateTime],
+              url: json[NoticeConstants.url],
+              docUrl: json[NoticeConstants.documentUrl],
+            );
+          },
+        ),
+      ),
+    );
   }
 }

@@ -1,0 +1,15 @@
+enum NoticeFrom{
+  admin,
+  principal,
+  examBranch,
+  feePayment,
+  placementOfficer,
+  cseHOD,
+  eceHOD,
+  eeeHOD,
+  itHOD,
+  civilHOD,
+  mechanicalHOD,
+  ecmHOD,
+  other,
+}

@@ -16,7 +16,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   final _pages = [
     StudentsParentsScreen(),
-    FacultyScreen(),
+     FacultyScreen(),
   ];
 
   @override

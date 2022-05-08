@@ -37,6 +37,13 @@ dependencies:
   bottom_navy_bar: ^6.0.0
   bloc: ^8.0.3
   flutter_bloc: ^8.0.1
+  firebase_core: ^1.14.0
+  firebase_database: ^9.0.10
+  equatable: ^2.0.3
+  cloud_firestore:
+  http: ^0.13.4
+  jiffy: ^5.0.0
+  url_launcher: ^6.1.0
 
 dev_dependencies:
   flutter_test:
@@ -63,8 +70,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-   - lib/src/assets/images/JBnew.png
-   - lib/src/assets/images/launcher.png
+   - lib/assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

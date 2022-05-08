@@ -12,7 +12,7 @@ class AppDrawer extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               CircleAvatar(
-                child: Image.asset('lib/src/assets/images/JBnew.png'),
+                child: Image.asset('lib/assets/images/JBnew.png'),
                 backgroundColor: Colors.transparent,
                 radius: 40.0,
               ),
@@ -36,7 +36,9 @@ class AppDrawer extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            onTap: () {},
+            onTap: () {
+              Navigator.pushNamed(context, '/push_notice');
+            },
           ),
         ),
         ListTile(
