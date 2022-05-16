@@ -19,17 +19,14 @@ class Notice {
 
   factory Notice.fromJson(Map<String, dynamic> json) {
     return Notice(
-      title: json['title'] ?? "",
-      description: json['description'] ?? "",
-      url: json['url'] ?? "",
-      dateTime: json['dateTime'] ?? "",
-      documentUrl: json['documentUrl'] ?? "",
+      title: json['title'],
+      description: json['description'],
+      url: json['url'],
+      dateTime: json['dateTime'],
+      documentUrl: json['documentUrl'],
       // noticefrom: getNoticeFromJsonValue(json['noticefrom'])!,
     );
   }
-
-
-
 
   static NoticeFrom? getNoticeFromJsonValue(String jsonValue) {
     Map<String, NoticeFrom> map = {

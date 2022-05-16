@@ -35,7 +35,11 @@ class _PushNoticeViewState extends State<PushNoticeView> {
   final titleController = TextEditingController();
   final descController = TextEditingController();
   final urlController = TextEditingController();
+
   NoticeTo noticeTo = NoticeTo.students;
+
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     BuildContext pushContext = context;
@@ -45,95 +49,121 @@ class _PushNoticeViewState extends State<PushNoticeView> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Row(
-                  children: [
-                    Radio(
-                        value: NoticeTo.students,
-                        groupValue: noticeTo,
-                        onChanged: (NoticeTo? value) {
-                          setState(() {
-                            noticeTo = value!;
-                          });
-                        }),
-                    const Text('Students'),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Radio(
-                        value: NoticeTo.faculty,
-                        groupValue: noticeTo,
-                        onChanged: (NoticeTo? value) {
-                          setState(() {
-                            noticeTo = value!;
-                          });
-                        }),
-                    const Text('Faculty')
-                  ],
-                )
-              ],
-            ),
-            TextFormField(
-              controller: titleController,
-              keyboardType: TextInputType.text,
-              textCapitalization: TextCapitalization.characters,
-              decoration: const InputDecoration(
-                label: Text('Enter Title'),
-                hintText: 'Enter your notice title',
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Row(
+                    children: [
+                      Radio(
+                          value: NoticeTo.students,
+                          groupValue: noticeTo,
+                          onChanged: (NoticeTo? value) {
+                            setState(() {
+                              noticeTo = value!;
+                            });
+                          }),
+                      const Text('Students'),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Radio(
+                          value: NoticeTo.faculty,
+                          groupValue: noticeTo,
+                          onChanged: (NoticeTo? value) {
+                            setState(() {
+                              noticeTo = value!;
+                            });
+                          }),
+                      const Text('Faculty')
+                    ],
+                  )
+                ],
               ),
-            ),
-            TextFormField(
-              controller: descController,
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                label: Text('Enter Description'),
-                hintText: 'Enter your notice description',
-              ),
-            ),
-            TextFormField(
-              controller: urlController,
-              initialValue: null,
-              keyboardType: TextInputType.url,
-              decoration: const InputDecoration(
-                label: Text('Enter Url'),
-                hintText: 'Enter your link',
-              ),
-            ),
-            const SizedBox(height: 15.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Upload your Document'),
-                ElevatedButton(
-                    onPressed: () {}, child: const Text('Select File'))
-              ],
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  try {
-                    pushContext.read<PushNoticesCubit>().pushNotice(
-                          notice: Notice(
-                            title: titleController.value.text,
-                            description: descController.value.text,
-                            url: urlController.value.text,
-                            dateTime: DateTime.now().toString(),
-                            documentUrl: urlController.value.text,
-                          ),
-                          noticeTo: sendNoticeTo(),
-                        );
-                    print('data pushed');
-                  } catch (e) {
-                    print(e.toString());
+              TextFormField(
+                controller: titleController,
+                keyboardType: TextInputType.text,
+                textCapitalization: TextCapitalization.characters,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter title';
                   }
-                  Navigator.popAndPushNamed(context, '/navigation');
+                  return null;
                 },
-                child: const Text('Push Notice'))
-          ],
+                decoration: const InputDecoration(
+                  label: Text('Enter Title'),
+                  hintText: 'Enter your notice title',
+                ),
+              ),
+              TextFormField(
+                controller: descController,
+                keyboardType: TextInputType.text,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter description';
+                  }
+                  return null;
+                },
+                decoration: const InputDecoration(
+                  label: Text('Enter Description'),
+                  hintText: 'Enter your notice description',
+                ),
+              ),
+              TextFormField(
+                controller: urlController,
+                initialValue: null,
+                keyboardType: TextInputType.url,
+                decoration: const InputDecoration(
+                  label: Text('Enter Url'),
+                  hintText: 'Enter your link',
+                ),
+              ),
+              const SizedBox(height: 15.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Upload your Document'),
+                  ElevatedButton(
+                      onPressed: () {}, child: const Text('Select File'))
+                ],
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    try {
+                      if (_formKey.currentState!.validate()) {
+                        pushContext.read<PushNoticesCubit>().pushNotice(
+                              notice: Notice(
+                                title: titleController.value.text,
+                                description: descController.value.text,
+                                url: urlController.value.text,
+                                dateTime: DateTime.now().toString(),
+                                documentUrl: urlController.value.text,
+                              ),
+                              noticeTo: sendNoticeTo(),
+                            );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Notice Pushed to Server')),
+                        );
+                        Navigator.popAndPushNamed(context, '/navigation');
+                      }else{
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Unable to push data')),
+                        );
+                      }
+                    } catch (e) {
+                      print(e.toString());
+                    }
+
+                  },
+                  child: const Text('Push Notice'))
+            ],
+          ),
         ),
       ),
     );

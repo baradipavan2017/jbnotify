@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
 import 'package:jb_notify/src/screens/faculty_screen.dart';
 import 'package:jb_notify/src/screens/students_parents_screen.dart';
+import 'package:jb_notify/src/screens/test_screen.dart';
 import 'package:jb_notify/src/widgets/drawer.dart';
 
 class NavigationScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   final _pages = [
     StudentsParentsScreen(),
-     FacultyScreen(),
+    FacultyScreen(),
   ];
 
   @override

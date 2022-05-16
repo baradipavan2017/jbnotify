@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 class NoticeListTile extends StatelessWidget {
   const NoticeListTile({
     Key? key,
@@ -21,9 +20,10 @@ class NoticeListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
-    child: Column(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,7 +35,9 @@ class NoticeListTile extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 3.0,),
+              const SizedBox(
+                height: 3.0,
+              ),
               Text(Jiffy(dateTime).yMMMdjm),
               const SizedBox(height: 5.0),
               Text(
@@ -52,7 +54,7 @@ class NoticeListTile extends StatelessWidget {
                   ? Container()
                   : TextButton.icon(
                       onPressed: () {
-                        _launchUrl(url);
+                        _launchUrl(context, url);
                       },
                       icon: const Icon(Icons.link),
                       label: const Text('Open Link'),
@@ -61,7 +63,7 @@ class NoticeListTile extends StatelessWidget {
                   ? Container()
                   : TextButton.icon(
                       onPressed: () {
-                        _launchUrl(docUrl);
+                        _launchUrl(context, docUrl);
                       },
                       icon: const Icon(Icons.pageview),
                       label: const Text("Open Document"),
@@ -74,14 +76,17 @@ class NoticeListTile extends StatelessWidget {
     );
   }
 
-  void _launchUrl(String url) async {
+  void _launchUrl(BuildContext context, String url) async {
     if (!await launchUrl(
       Uri.parse(url),
       mode: LaunchMode.externalApplication,
-    )
-    );
-    else{
-      print('Error while launching the url');
+    )) {
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to launch url'),
+        ),
+      );
     }
   }
 }

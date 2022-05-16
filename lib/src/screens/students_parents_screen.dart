@@ -1,34 +1,48 @@
-import 'package:firebase_database/firebase_database.dart';
-import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:jb_notify/src/config/api_constants.dart';
+import 'package:jb_notify/src/model/notice_model.dart';
 import 'package:jb_notify/src/widgets/notice_list_tile.dart';
 
 class StudentsParentsScreen extends StatelessWidget {
-  StudentsParentsScreen({Key? key}) : super(key: key);
-  final dbRef = FirebaseDatabase.instance.ref().child(APIConstants.student);
-
+  const StudentsParentsScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    dbRef.keepSynced(true);
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: FirebaseAnimatedList(
-          query: dbRef,
-          itemBuilder: (BuildContext context, DataSnapshot snapShot,
-              Animation<double> animation, int index) {
-            var json = Map<String, dynamic>.from(snapShot.value as Map);
-            return NoticeListTile(
-              title: json[NoticeConstants.title],
-              description: json[NoticeConstants.description],
-              dateTime: json[NoticeConstants.dateTime],
-              url: json[NoticeConstants.url],
-              docUrl: json[NoticeConstants.documentUrl],
-            );
+      body: SafeArea(
+        child: StreamBuilder<List<Notice>>(
+          stream: readUsers(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('Unable to fetch data ${snapshot.hasError}'),
+              );
+            } else if (snapshot.hasData) {
+              final user = snapshot.data!;
+              return ListView(
+                children: user.map(buildNotice).toList(),
+              );
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
           },
         ),
       ),
     );
   }
+
+  Widget buildNotice(Notice notice) => NoticeListTile(
+        title: notice.title,
+        description: notice.description,
+        dateTime: notice.dateTime,
+        url: notice.url,
+        docUrl: notice.documentUrl,
+      );
+
+  Stream<List<Notice>> readUsers() => FirebaseFirestore.instance
+      .collection(APIConstants.student)
+      .orderBy(NoticeConstants.dateTime, descending: true)
+      .snapshots()
+      .map((snapshot) =>
+          snapshot.docs.map((doc) => Notice.fromJson(doc.data())).toList());
 }
