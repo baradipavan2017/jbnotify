@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:jb_notify/src/widgets/alert_dialog.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class NoticeListTile extends StatelessWidget {
-  const NoticeListTile({
+class MyNoticeListTile extends StatelessWidget {
+  const MyNoticeListTile({
     Key? key,
     required this.title,
     required this.description,
@@ -20,20 +21,36 @@ class NoticeListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
+    return Container(
+      padding: const EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 0.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  GestureDetector(
+                      onTap: () {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) =>
+                                const CustomAlertDialog());
+                      },
+                      child: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ))
+                ],
               ),
               const SizedBox(
                 height: 3.0,

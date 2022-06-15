@@ -1,8 +1,10 @@
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:jb_notify/src/cubit/firebase_sign_in_cubit.dart';
+import 'package:jb_notify/src/enums/user_type.dart';
 import 'package:jb_notify/src/repository/firebase_authentication.dart';
 import 'package:jb_notify/src/screens/navigation_screen.dart';
 
@@ -42,15 +44,28 @@ class _LoginScreenViewState extends State<LoginScreenView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        leading: GestureDetector(
+          onTap: (){
+            Navigator.of(context).pop();
+          },
+          child: const Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0.0,
+      ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 50),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0,),
         child: SingleChildScrollView(
           child: Column(
             children: [
               Form(
                 key: _formKey,
                 child: Column(
-                  // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     const Text(
                       'Faculty Login',
@@ -125,31 +140,36 @@ class _LoginScreenViewState extends State<LoginScreenView> {
                         context: context,
                         builder: (BuildContext ctx) {
                           loadingContext = ctx;
-                          return const CircularProgressIndicator();
+                          return const Center(
+                              child: CircularProgressIndicator());
                         }).then((value) {
                       loadingContext = null;
                     });
                   }
                   if (state is FirebaseSignInSuccess) {
-                    final String? value = state.user?.uid;
-                    print(value);
+                    final User? user = state.user;
                     Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
                             builder: (BuildContext context) =>
-                                const NavigationScreen()),
+                                const NavigationScreen(
+                                  userType: UserType.faculty,
+                                ),
+                            settings: RouteSettings(arguments: user)),
                         (route) => false);
                   } else if (state is FirebaseSignInFailure) {
+                    print("state error --- >>> ${state.message}");
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Unable to login! Please try again !'),
+                       SnackBar(
+                        content: Text(state.message),
                       ),
                     );
                   } else if (state is FirebaseSignInError) {
+                    print("state error signin error--- >>> ${state.message}");
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                       SnackBar(
                         content:
-                            Text('Some error has occurred!. Try again later.'),
+                            Text(state.message.toString()),
                       ),
                     );
                   }
@@ -158,7 +178,9 @@ class _LoginScreenViewState extends State<LoginScreenView> {
                   return ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        context.read<FirebaseSignInCubit>().loginWithEmailAndPass(
+                        context
+                            .read<FirebaseSignInCubit>()
+                            .loginWithEmailAndPass(
                               email: emailController.value.text,
                               password: passwordController.value.text,
                             );

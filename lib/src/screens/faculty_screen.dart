@@ -13,6 +13,11 @@ class FacultyScreen extends StatelessWidget {
         child: StreamBuilder<List<Notice>>(
           stream: readUsers(),
           builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.none) {
+              return Container(
+                child: Image.asset("lib/assets/images/no_wifi.png"),
+              );
+            }
             if (snapshot.hasError) {
               return Center(
                 child: Text('Unable to fetch data ${snapshot.hasError}'),

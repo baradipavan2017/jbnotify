@@ -1,22 +1,40 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:jb_notify/src/cubit/firebase_sign_in_cubit.dart';
 import 'package:jb_notify/src/cubit/push_notices_cubit.dart';
 import 'package:jb_notify/src/enums/notice_to.dart';
 import 'package:jb_notify/src/model/notice_model.dart';
+import 'package:jb_notify/src/repository/firebase_authentication.dart';
 import 'package:jb_notify/src/repository/notices_repository.dart';
+import 'package:path/path.dart' as p;
 
 class PushNotice extends StatelessWidget {
   const PushNotice({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<PushNoticesCubit>(
-      create: (context) {
-        return PushNoticesCubit(
-          noticeRepositories: NoticeRepositories(),
-        );
-      },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<PushNoticesCubit>(
+          create: (context) {
+            return PushNoticesCubit(
+              noticeRepositories: NoticeRepositories(),
+            );
+          },
+        ),
+        BlocProvider<FirebaseSignInCubit>(create: (context) {
+          return FirebaseSignInCubit(
+            authServices: AuthenticationServices(),
+          );
+        })
+      ],
       child: const PushNoticeView(),
     );
   }
@@ -35,10 +53,22 @@ class _PushNoticeViewState extends State<PushNoticeView> {
   final titleController = TextEditingController();
   final descController = TextEditingController();
   final urlController = TextEditingController();
+  Future? databaseURL;
+  String documentUrl = '';
+   String fileName = '';
 
+  String uid = '';
   NoticeTo noticeTo = NoticeTo.students;
 
   final _formKey = GlobalKey<FormState>();
+
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
+  String getUID() {
+    final User user = auth.currentUser!;
+    final uid = user.uid;
+    return uid;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,8 +158,16 @@ class _PushNoticeViewState extends State<PushNoticeView> {
                 children: [
                   const Text('Upload your Document'),
                   ElevatedButton(
-                      onPressed: () {}, child: const Text('Select File'))
+                    onPressed: () {
+                      uploadFile();
+                    },
+                    child: const Text('Select File'),
+                  )
                 ],
+              ),
+              fileName.isEmpty ? Container() : Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(fileName,),
               ),
               ElevatedButton(
                   onPressed: () {
@@ -141,25 +179,38 @@ class _PushNoticeViewState extends State<PushNoticeView> {
                                 description: descController.value.text,
                                 url: urlController.value.text,
                                 dateTime: DateTime.now().toString(),
-                                documentUrl: urlController.value.text,
+                                documentUrl: documentUrl,
+                                uid: getUID(),
                               ),
                               noticeTo: sendNoticeTo(),
                             );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Notice Pushed to Server')),
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //   SnackBar(
+                        //       content: Text(
+                        //           'Notice Pushed to ${sendNoticeTo()} Server ')),
+                        // );
+                        Fluttertoast.showToast(
+                          msg: 'Notice Pushed to ${sendNoticeTo()} Server ',
+                          textColor: Colors.white,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 2,
                         );
-                        Navigator.popAndPushNamed(context, '/navigation');
-                      }else{
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Unable to push data')),
+                        Navigator.of(context).pop();
+                      } else {
+                        Fluttertoast.showToast(
+                          msg: 'Unable to push data',
+                          textColor: Colors.white,
+                          gravity: ToastGravity.BOTTOM,
+                          timeInSecForIosWeb: 2,
                         );
+
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //   const SnackBar(content: Text('Unable to push data')),
+                        // );
                       }
                     } catch (e) {
                       print(e.toString());
                     }
-
                   },
                   child: const Text('Push Notice'))
             ],
@@ -177,6 +228,35 @@ class _PushNoticeViewState extends State<PushNoticeView> {
     }
   }
 
+  Future uploadFile() async {
+    try {
+      final pickFile =
+          await FilePicker.platform.pickFiles(allowMultiple: false);
+      if (pickFile == null) return;
+      final filePath = pickFile.files.single.path;
+      File file = File(filePath!);
+
+      //Pushing file to firestore
+      if (file == null) return;
+      fileName = p.basename(file.path);
+      setState(() {});
+      final destination = 'files/$fileName';
+
+      UploadTask? task =
+          NoticeRepositories.uploadFile(destination: destination, file: file);
+
+      final snapShot = await task!.whenComplete(() {});
+      databaseURL = snapShot.ref.getDownloadURL();
+
+      databaseURL?.then((value) {
+        String? value1 = value;
+        documentUrl = value1!;
+      });
+    } catch (e) {
+      print('upload file error ${e.toString()}');
+    }
+  }
+
   @override
   void dispose() {
     titleController.dispose();
@@ -185,9 +265,3 @@ class _PushNoticeViewState extends State<PushNoticeView> {
     super.dispose();
   }
 }
-// database.child('/newDatabase').set({
-//   'title': titleController.value.text,
-//   'description': descController.value.text,
-//   'dateTime': DateTime.now().toString(),
-//   'url': urlController.value.text,
-// });

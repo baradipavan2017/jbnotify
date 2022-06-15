@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:jb_notify/src/model/notice_model.dart';
 
@@ -14,6 +17,7 @@ class NoticeRepositories {
         'dateTime': notice.dateTime,
         'url': notice.url,
         'documentUrl': notice.documentUrl,
+        'uid':notice.uid
       });
     } catch (e) {
       if (kDebugMode) {
@@ -34,4 +38,14 @@ class NoticeRepositories {
     // }
   }
 
+  static UploadTask? uploadFile(
+      {required String destination, required File file}) {
+    try {
+      final ref = FirebaseStorage.instance.ref(destination);
+      return ref.putFile(file);
+    } on FirebaseException catch (e) {
+      print('Firebase Api repository error ${e.message.toString()}');
+      return null;
+    }
+  }
 }

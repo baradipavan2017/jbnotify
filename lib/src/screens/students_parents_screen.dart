@@ -9,24 +9,27 @@ class StudentsParentsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: StreamBuilder<List<Notice>>(
-          stream: readUsers(),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) {
-              return Center(
-                child: Text('Unable to fetch data ${snapshot.hasError}'),
-              );
-            } else if (snapshot.hasData) {
-              final user = snapshot.data!;
-              return ListView(
-                children: user.map(buildNotice).toList(),
-              );
-            } else {
-              return const Center(child: CircularProgressIndicator());
-            }
-          },
-        ),
+      body: StreamBuilder<List<Notice>>(
+        stream: readUsers(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.none) {
+            return Container(
+              child: Image.asset("lib/assets/images/no_wifi.png"),
+            );
+          }
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('Unable to fetch data ${snapshot.hasError}'),
+            );
+          } else if (snapshot.hasData) {
+            final user = snapshot.data!;
+            return ListView(
+              children: user.map(buildNotice).toList(),
+            );
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
       ),
     );
   }

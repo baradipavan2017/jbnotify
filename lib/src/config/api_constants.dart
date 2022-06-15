@@ -11,3 +11,8 @@ class NoticeConstants {
   static const url = 'url';
   static const documentUrl = 'documentUrl';
 }
+
+class SecureStorageConstants{
+  static const uid = 'uid';
+  static const credentials = 'credentials';
+}

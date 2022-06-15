@@ -7,6 +7,7 @@ class Notice {
   final String url;
   final String dateTime;
   final String documentUrl;
+  final String uid;
   // final NoticeFrom noticefrom;
   Notice({
     required this.title,
@@ -14,6 +15,7 @@ class Notice {
     required this.url,
     required this.dateTime,
     required this.documentUrl,
+    required this.uid,
     // required this.noticefrom,
   });
 
@@ -24,6 +26,7 @@ class Notice {
       url: json['url'],
       dateTime: json['dateTime'],
       documentUrl: json['documentUrl'],
+      uid: json['uid']
       // noticefrom: getNoticeFromJsonValue(json['noticefrom'])!,
     );
   }

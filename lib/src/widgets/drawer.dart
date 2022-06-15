@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:jb_notify/src/enums/user_type.dart';
+import 'package:jb_notify/src/repository/firebase_authentication.dart';
 
 class AppDrawer extends StatelessWidget {
-  const AppDrawer({Key? key}) : super(key: key);
-
+  const AppDrawer({Key? key, required this.userType}) : super(key: key);
+  final UserType userType;
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -26,21 +28,22 @@ class AppDrawer extends StatelessWidget {
             ],
           ),
         ),
-        Card(
-          child: ListTile(
-            leading: const Icon(Icons.notifications),
-            title: const Text(
-              'Send Data',
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            onTap: () {
-              Navigator.pushNamed(context, '/push_notice');
-            },
-          ),
-        ),
+        userType == UserType.faculty
+            ? ListTile(
+                leading: const Icon(Icons.notifications),
+                title: const Text(
+                  'My Notices',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pushNamed(context, '/my_notice_screen');
+                },
+              )
+            : Container(),
+        const Divider(),
         ListTile(
           leading: const Icon(Icons.book_online),
           title: const Text(
@@ -65,6 +68,21 @@ class AppDrawer extends StatelessWidget {
           onTap: () {},
         ),
         const Divider(),
+        userType == UserType.faculty ?
+        ListTile(
+          leading: const Icon(Icons.logout),
+          title: const Text(
+            'Logout',
+            style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          onTap: () {
+            AuthenticationServices().logout();
+            Navigator.pushReplacementNamed(context, '/welcome_screen');
+          },
+        ) : Container(),
       ]),
     );
   }

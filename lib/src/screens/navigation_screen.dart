@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:bottom_navy_bar/bottom_navy_bar.dart';
+import 'package:jb_notify/src/enums/user_type.dart';
 import 'package:jb_notify/src/screens/faculty_screen.dart';
 import 'package:jb_notify/src/screens/students_parents_screen.dart';
-import 'package:jb_notify/src/screens/test_screen.dart';
 import 'package:jb_notify/src/widgets/drawer.dart';
 
 class NavigationScreen extends StatefulWidget {
-  const NavigationScreen({Key? key}) : super(key: key);
+  const NavigationScreen({Key? key, required this.userType}) : super(key: key);
+  final UserType userType;
 
   @override
   State<NavigationScreen> createState() => _NavigationScreenState();
@@ -14,10 +15,9 @@ class NavigationScreen extends StatefulWidget {
 
 class _NavigationScreenState extends State<NavigationScreen> {
   int _selectedPageIndex = 0;
-
   final _pages = [
-    StudentsParentsScreen(),
-    FacultyScreen(),
+    const StudentsParentsScreen(),
+    const FacultyScreen(),
   ];
 
   @override
@@ -36,8 +36,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
         elevation: 0.0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      drawer: const AppDrawer(),
-      body: _pages[_selectedPageIndex],
+      drawer: AppDrawer(userType: widget.userType),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 5.0),
+        child: _pages[_selectedPageIndex],
+      ),
       bottomNavigationBar: BottomNavyBar(
         selectedIndex: _selectedPageIndex,
         showElevation: false,
